@@ -1,8 +1,6 @@
 """
 BUSINESS CASE
 TASK 1
-
-Jakub.Adamowicz@CBRE.com
 """
 import pandas as pd
 import numpy as np
@@ -10,9 +8,9 @@ import numpy as np
 # -*- coding: utf8 -*-
 
 # Paths to the files needed in TASK 1
-file1 = r'C:\Users\jadamowicz\Desktop\test\Table_0.xlsx'
-file2 = r'C:\Users\jadamowicz\Desktop\test\Table_1.csv'
-file3 = r'C:\Users\jadamowicz\Desktop\test\Table_2.xlsx'
+file1 = r'C:\Users\jakub\PAT_interview\Table_0.xlsx'
+file2 = r'C:\Users\jakub\PAT_interview\Table_1.csv'
+file3 = r'C:\Users\jakub\PAT_interview\Table_2.xlsx'
 
 """
 1. Load and merge all files Table_* using pandas package
@@ -28,9 +26,9 @@ df2["Type"].replace({"?45": "Ź45", "V1?R": "V1ŹR", "V0?P": "V0ŹP"}, inplace=T
 
 
 # Joining three DataFrames into one DataFrame
-df = df1.append(df2)
-df = df.append(df3)
-df.reset_index(inplace=True)
+to_concat = [df1, df2, df3]
+df = pd.concat(to_concat)
+
 """
 2. Drop duplicates if any appear in data
 """
@@ -50,7 +48,8 @@ df['Func Unit'].fillna(1337, inplace=True)
 5. For each row calculate difference (number of days) between Acctg Date and Date columns
 """
 # Convertion of date columns into DateTime and counting difference in days
-df[['Acctg Date', 'Date']] = df[['Acctg Date', 'Date']].apply(pd.to_datetime)
+df['Acctg Date'] = pd.to_datetime(df['Acctg Date'])
+df['Date'] = pd.to_datetime(df['Date'])
 df['Days Diff'] = (df['Acctg Date'] - df['Date']).dt.days
 
 """
@@ -58,24 +57,25 @@ df['Days Diff'] = (df['Acctg Date'] - df['Date']).dt.days
 (ignore weekends and UK bank holidays)
 """
 # Using numpy busday_count, creation of copied DataFrame to make counting only on rows with column "Dates" filled
-df['index1'] = df.index
-dfCopy = df.copy()
-dfCopy.dropna(subset=['Days Diff'], inplace=True)
-dfCopy["Business Days"] = np.busday_count(dfCopy["Date"].dt.date, dfCopy["Acctg Date"].dt.date)
 
-# Adding "Business Days" column to the DataFrame
-dfCopy = dfCopy[["index1", "Business Days"]]
-df = pd.merge(df, dfCopy, how='left', on="index1")
-df.drop(["index1"], axis=1, inplace=True)
+def business_days(start, end):
+    mask = pd.notnull(start) & pd.notnull(end)
+    start = start.values.astype('datetime64[D]')[mask]
+    end = end.values.astype('datetime64[D]')[mask]
+    result = np.empty(len(mask), dtype=float)
+    result[mask] = np.busday_count(start, end)
+    result[~mask] = np.nan
+    return result
 
+df["Business Days"] = business_days(df['Acctg Date'], df['Date'])
 """
 7. Convert Amount to PLN using FXrates.csv
 """
-convPath = r'C:\Users\jadamowicz\Desktop\test\FXrates.csv'
-convFrame = pd.read_csv(convPath, sep=',', lineterminator='\n', index_col='Currency').squeeze()
+conv_path = r'C:\Users\jakub\PAT_interview\FXrates.csv'
+conv_frame = pd.read_csv(conv_path, sep=',', lineterminator='\n', index_col='Currency').squeeze()
 
-df = df.merge(convFrame, how='left', left_on='Currency', right_on='Currency')
-df['Amount PLN'] = (df['Amount'] / df['Per USD\r']) * convFrame.loc['PLN']
+df = df.merge(conv_frame, how='left', left_on='Currency', right_on='Currency')
+df['Amount PLN'] = (df['Amount'] / df['Per USD\r']) * conv_frame.loc['PLN']
 df.drop(columns=['Per USD\r'], inplace=True)
 
 """
@@ -83,11 +83,11 @@ df.drop(columns=['Per USD\r'], inplace=True)
 use Type in name of saved file (for example Table_4P4.xlsx)
 """
 
-uniqueTypes = df.Type.unique()
-outfolder = r'C:\Users\jadamowicz\Desktop\test\Table_'
-for type in uniqueTypes:
-    dftype = df.copy()
-    dftype.drop(dftype[dftype.Type != type].index, inplace=True)
-    writer = pd.ExcelWriter(outfolder + str(type) + ".xlsx", engine='xlsxwriter')
-    dftype.to_excel(writer, sheet_name="Audit1", index=False)
-    writer.save()
+unique_types = df.Type.unique()
+out_folder = r'C:\Users\jakub\PAT_interview\Table_'
+for type in unique_types:
+    temp = df.loc[df.Type == type]
+    file_name = f'{out_folder}{type}.xlsx'
+    temp.to_excel(file_name, index=False)
+
+
