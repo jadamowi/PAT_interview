@@ -68,6 +68,7 @@ def business_days(start, end):
     return result
 
 df["Business Days"] = business_days(df['Acctg Date'], df['Date'])
+
 """
 7. Convert Amount to PLN using FXrates.csv
 """
