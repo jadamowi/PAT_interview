@@ -18,9 +18,9 @@ file3 = r'C:\Users\jadamowicz\Desktop\test\Table_2.xlsx'
 1. Load and merge all files Table_* using pandas package
 """
 # Creating DataFrames from the given files
-df1 = pd.DataFrame(pd.read_excel(file1, engine='openpyxl'))
-df3 = pd.DataFrame(pd.read_excel(file3, engine='openpyxl'))
-df2 = pd.DataFrame(pd.read_csv(file2, sep=',', lineterminator='\n', encoding='utf-8'))
+df1 = pd.read_excel(file1, engine='openpyxl')
+df3 = pd.read_excel(file3, engine='openpyxl')
+df2 = pd.read_csv(file2, sep=',', lineterminator='\n', encoding='utf-8')
 
 df2.replace({r'\r': ''}, regex=True, inplace=True)
 df2.rename(columns={'Origin\r': 'Origin'}, inplace=True)
