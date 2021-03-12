@@ -49,4 +49,5 @@ def decoder(morse):
 
 
 if __name__ == '__main__':
-    print(morsecheck(textToDecode))
+    result = morsecheck(textToDecode)
+    print(result)
