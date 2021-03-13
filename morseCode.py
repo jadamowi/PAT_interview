@@ -23,10 +23,10 @@ def morsecheck(morse):
     a string with information, if it's valid return
     encryption function
     """
-    if any(substr.isalnum() for substr in morse):
-        return "This is an invalid morse code"
-    else:
+    if not any(substr.isalnum() for substr in morse):
         return decoder(morse)
+    else:
+        raise ValueError('This is an invalid Morse Code')
 
 
 def decoder(morse):
