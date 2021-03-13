@@ -23,4 +23,5 @@ def backward(string):
 
 
 if __name__ == '__main__':
-    print(backward(text))
+    result = backward(text)
+    print(result)
