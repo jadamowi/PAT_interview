@@ -1,4 +1,4 @@
-morseDict = {
+morse_dict = {
     'A': ' .- ', 'B': ' -... ', 'C': ' -.-. ',
     'D': ' -.. ', 'E': ' . ', 'F': ' ..-. ',
     'G': ' --. ', 'H': ' .... ', 'I': ' .. ',
@@ -11,7 +11,7 @@ morseDict = {
 }
 
 # text to be entered by user
-textToDecode = input('Enter Morse code to be decoded:')
+text_to_decode = input('Enter Morse code to be decoded:')
 
 
 def morsecheck(morse):
@@ -40,7 +40,7 @@ def decoder(morse):
     wordlist = morse.split()
     wordlist = [x.center(len(x) + 2) for x in wordlist]
 
-    for letter, sign in morseDict.items():
+    for letter, sign in morse_dict.items():
         wordlist = [x.replace(sign, letter) for x in wordlist]
 
     wordlist = [x.replace(' space ', ' ') for x in wordlist]
@@ -49,5 +49,5 @@ def decoder(morse):
 
 
 if __name__ == '__main__':
-    result = morsecheck(textToDecode)
+    result = morsecheck(text_to_decode)
     print(result)
