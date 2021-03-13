@@ -56,7 +56,6 @@ df['Days Diff'] = (df['Acctg Date'] - df['Date']).dt.days
 6. For each row calculate difference (number of BUSINESS days) between Acctg Date and Date columns
 (ignore weekends and UK bank holidays)
 """
-# Using numpy busday_count, creation of copied DataFrame to make counting only on rows with column "Dates" filled
 
 def business_days(start, end):
     mask = pd.notnull(start) & pd.notnull(end)
